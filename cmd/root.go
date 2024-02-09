@@ -6,7 +6,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/nanyte25/glitchtipctl/cmd/login"
+	"github.com/nanyte25/glitchtipctl/cmd/project"
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +35,7 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(login.LoginCmd)
+	rootCmd.AddCommand(project.GetProjectsCmd)
 	// Initialize other commands and flags
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
