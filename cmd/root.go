@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/nanyte25/glitchtipctl/cmd/project"
+	"github.com/nanyte25/glitchtipctl/cmd/team"
 	"github.com/spf13/cobra"
 )
 
@@ -36,6 +37,7 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(project.GetProjectsCmd)
+	rootCmd.AddCommand(team.GetTeamsCmd)
 	// Initialize other commands and flags
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
