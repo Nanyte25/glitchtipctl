@@ -1,6 +1,5 @@
 /*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
+Mark Freer GlitchtipCTL Author 2024
 */
 package cmd
 
