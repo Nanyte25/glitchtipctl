@@ -6,6 +6,7 @@ package cmd
 import (
 	"os"
 
+	"github.com/nanyte25/glitchtipctl/cmd/organization"
 	"github.com/nanyte25/glitchtipctl/cmd/project"
 	"github.com/nanyte25/glitchtipctl/cmd/team"
 	"github.com/spf13/cobra"
@@ -36,9 +37,13 @@ func Execute() {
 }
 
 func init() {
+	// Create Glitchtip Error tracking organization
 	rootCmd.AddCommand(project.GetProjectsCmd)
 	rootCmd.AddCommand(team.GetTeamsCmd)
-	rootCmd.AddCommand(team.CreateTeamCmd) //add nee teams feature
+	rootCmd.AddCommand(team.CreateTeamCmd)
+	rootCmd.AddCommand(organization.CreateOrganizationCmd) // N.B. make these global package once all are completed
+
+	//add new teams feature
 	// Initialize other commands and flags
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolP("toggle", "t", false, "To toggle the debug mode")
 }

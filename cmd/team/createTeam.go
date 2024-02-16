@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
 
@@ -22,6 +23,10 @@ var CreateTeamCmd = &cobra.Command{
 	Long: `Create a new team within a specified organization. This command requires both the organization name 
 and the team name.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Load environment variables from .env file at runtime
+		if err := godotenv.Load(); err != nil {
+			fmt.Println("Warning: No .env file found")
+		}
 		createTeam(orgName, teamName)
 	},
 }
@@ -40,13 +45,17 @@ func createTeam(orgName, teamName string) {
 		return
 	}
 
-	// Replace "https://localhost:8000" with the actual Glitchtip API endpoint if not using localhost
-	url := fmt.Sprintf("https://localhost:8000/api/0/organizations/%s/teams/", orgName)
+	glitchtipURL := os.Getenv("GLITCHTIP_URL") // Retrieve the Glitchtip URL from environment variable
+	if glitchtipURL == "" {
+		fmt.Println("Error: GLITCHTIP_URL environment variable is not set.")
+		return
+	}
 
-	// Including both 'name' and 'slug' in the payload
+	url := fmt.Sprintf("%s/0/organizations/%s/teams/", glitchtipURL, orgName)
+
 	payload := map[string]string{
 		"name": teamName,
-		"slug": generateSlug(teamName), // This function should generate a slug from the team name
+		"slug": generateSlug(teamName),
 	}
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -61,7 +70,7 @@ func createTeam(orgName, teamName string) {
 	}
 
 	req.Header.Add("Authorization", "Bearer "+apiToken)
-	req.Header.Add("Content-Type", "application/json") // Set Content-Type header
+	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -70,23 +79,36 @@ func createTeam(orgName, teamName string) {
 	}
 	defer resp.Body.Close()
 
-	// Check the response status code
-	if resp.StatusCode != http.StatusCreated { // Assuming 201 is the success status code
+	// Handle response
+	if resp.StatusCode == http.StatusCreated {
+		var teamResponse struct {
+			DateCreated string   `json:"dateCreated"`
+			ID          string   `json:"id"`
+			IsMember    bool     `json:"isMember"`
+			MemberCount int      `json:"memberCount"`
+			Slug        string   `json:"slug"`
+			Projects    []string `json:"projects"`
+		}
+
+		err := json.NewDecoder(resp.Body).Decode(&teamResponse)
+		if err != nil {
+			fmt.Printf("Error decoding response body: %v\n", err)
+			return
+		}
+
+		fmt.Printf("Team created successfully:\n")
+		fmt.Printf("- ID: %s\n- Slug: %s\n- Date Created: %s\n- Member Count: %d\n", teamResponse.ID, teamResponse.Slug, teamResponse.DateCreated, teamResponse.MemberCount)
+	} else {
 		bodyBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Printf("Error reading response body: %v\n", err)
 			return
 		}
 		fmt.Printf("Failed to create team, status code: %d, details: %s\n", resp.StatusCode, string(bodyBytes))
-	} else {
-		fmt.Println("Team created successfully")
 	}
 }
 
-// GenerateSlug is a placeholder for your slug generation logic.
-// You need to implement this function based on your requirements or Glitchtip's slug rules.
 func generateSlug(name string) string {
-	// Implement slug generation logic here. This is a simplistic approach.
-	// For real use, consider edge cases and ensure uniqueness within the organization.
+	// Simple slug generation, adapt as needed for your application's requirements
 	return strings.ToLower(strings.ReplaceAll(name, " ", "-"))
 }
