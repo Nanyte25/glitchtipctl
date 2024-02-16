@@ -38,6 +38,7 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(project.GetProjectsCmd)
 	rootCmd.AddCommand(team.GetTeamsCmd)
+	rootCmd.AddCommand(team.CreateTeamCmd) //add nee teams feature
 	// Initialize other commands and flags
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
