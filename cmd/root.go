@@ -41,7 +41,8 @@ func init() {
 	rootCmd.AddCommand(project.GetProjectsCmd)
 	rootCmd.AddCommand(team.GetTeamsCmd)
 	rootCmd.AddCommand(team.CreateTeamCmd)
-	rootCmd.AddCommand(organization.CreateOrganizationCmd) // N.B. make these global package once all are completed
+	rootCmd.AddCommand(organization.CreateOrganizationCmd)
+	rootCmd.AddCommand(organization.GetOrganizationsCmd)
 
 	//add new teams feature
 	// Initialize other commands and flags
