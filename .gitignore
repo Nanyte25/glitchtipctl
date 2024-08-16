@@ -1,29 +1,66 @@
-# Compiled source #
-###################
-*.com
-*.class
-*.dll
+# Binaries for programs and plugins
 *.exe
-*.o
+*.dll
 *.so
+*.dylib
+*.bin
 
-# Packages #
-############
-# it's better to exclude the node_modules or vendor directories
-node_modules/
+# Output directories
+/dist/
+/build/
+/target/
+/release/
+
+# Go specific files
+*.log
+*.test
+*.out
+*.sum
+
+# Dependency directories (vendor/)
 vendor/
 
-# Logs and databases #
-######################
-*.log
-*.sql
-*.sqlite
+# Go build artifacts
+*.o
+*.a
+*.lo
+*.la
+*.lai
+*.loT
+*.gox
 
-# OS generated files #
-######################
+# Go coverage tool files
+*.cover
+*.coverprofile
+*.cov
+
+# GoReleaser files
+dist/
+artifacts/
+coverage.out
+
+# Config files for editors (VSCode, etc.)
+.vscode/
+.idea/
+*.swp
+
+# OS generated files
 .DS_Store
 Thumbs.db
 
-# Environment files #
-#####################
+# Go mod and cache
+/go.sum
+/go/pkg/
+/go/bin/
+/go/src/cache
+
+# GitHub Actions
+/.github/workflows/
 .env
+
+# Logs
+*.log
+
+# Build output
+glitchtipctl
+glitchtipctl.exe
