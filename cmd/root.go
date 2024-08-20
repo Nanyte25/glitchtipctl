@@ -12,28 +12,34 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "glitchtipctl",
-	Short: "glitchtipctl is a commandline tool for Glitchtip error Tracking software.",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application.`,
+	Short: "glitchtipctl is a commandline tool for Glitchtip error tracking software.",
+	Long: `glitchtipctl is a commandline tool for interacting with the GlitchTip error tracking software.
+
+This tool provides various commands for managing organizations, projects, teams, users, and more. 
+Use this CLI to automate and manage tasks within your GlitchTip account.`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
+// RootCmd exposes the root command to other packages
+func RootCmd() *cobra.Command {
+	return rootCmd
+}
+
 func init() {
-	// Add your commands
+	// Add your commands here. These commands are added as subcommands of the root command.
 	rootCmd.AddCommand(project.GetProjectsCmd)
 	rootCmd.AddCommand(team.GetTeamsCmd)
 	rootCmd.AddCommand(team.CreateTeamCmd)
 	rootCmd.AddCommand(organization.CreateOrganizationCmd)
 	rootCmd.AddCommand(organization.GetOrganizationsCmd)
 
-	// Additional features can be added here.
+	// Additional commands can be added here.
 	rootCmd.Flags().BoolP("toggle", "t", false, "To toggle the debug mode")
 }
