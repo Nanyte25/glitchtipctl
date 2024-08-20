@@ -27,7 +27,6 @@ archives:
     files:
       - LICENSE
       - README.md
-      - CHANGELOG.md
 
 # Define GitHub release configuration
 release:
