@@ -1,40 +1,61 @@
-/*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 )
 
-// getMembersCmd represents the getMembers command
-var getMembersCmd = &cobra.Command{
+// GetMembersCmd represents the getMembers command
+var GetMembersCmd = &cobra.Command{
 	Use:   "getMembers",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Get a list of members from your organization",
+	Long:  `This command makes an HTTP GET request to the GlitchTip API and prints out the list of members from your organization.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("getMembers called")
+		apiToken := os.Getenv("GLITCHTIP_API_TOKEN")
+		if apiToken == "" {
+			fmt.Println("Error: GLITCHTIP_API_TOKEN environment variable is not set.")
+			return
+		}
+
+		// Use shared spinner model and fetch function
+		model := newModel(apiToken, fetchMembers(apiToken))
+		program := tea.NewProgram(model)
+
+		// Start the program
+		if err := program.Start(); err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
 	},
 }
 
+func fetchMembers(apiToken string) func() tea.Msg {
+	return func() tea.Msg {
+		url := "http://localhost:8000/api/0/organizations/0/members/" // Replace <org_slug> with your actual org slug
+		headers := []string{"ID", "Name", "Email"}
+
+		// Extract data function for formatting
+		extractData := func(body []byte) [][]string {
+			var members []map[string]interface{}
+			json.Unmarshal(body, &members)
+
+			data := [][]string{}
+			for _, member := range members {
+				id := fmt.Sprintf("%v", member["id"])
+				name := fmt.Sprintf("%v", member["name"])
+				email := fmt.Sprintf("%v", member["email"])
+				data = append(data, []string{id, name, email})
+			}
+			return data
+		}
+
+		return fetchData(url, apiToken, headers, extractData)
+	}
+}
+
 func init() {
-	rootCmd.AddCommand(getMembersCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// getMembersCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// getMembersCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.AddCommand(GetMembersCmd)
 }
