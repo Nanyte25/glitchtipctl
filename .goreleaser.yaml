@@ -1,8 +1,8 @@
-project_name: glitchtipctl
+# .goreleaser.yml
 
+# Define the GoReleaser build settings
 builds:
-  - id: my_build
-    main: ./main.go
+  - id: default
     goos:
       - windows
       - linux
@@ -10,18 +10,47 @@ builds:
     goarch:
       - amd64
       - arm64
+    main: ./main.go
+    ldflags:
+      - "-s -w -X main.version={{.Version}}"
+    binary: "glitchtipctl"
 
-archive:
-  format: tar.gz
-  files:
-    - LICENSE
-    - README.md
-
-changelog:
-  use: git
-
+# Define the release settings
 release:
   github:
-    owner: Nanyte25
-    name: glitchtipctl
-    token: ${{ secrets.GITHUB_TOKEN }}
+    owner: your-github-username
+    name: your-repo-name
+    draft: false
+    prerelease: false
+
+# Define the distribution packaging
+brews:
+  - name: glitchtipctl
+    tap:
+      owner: nanyte25
+      name: homebrew-tap
+    description: "CLI for Glitchtip Error Tracking software"
+    homepage: "https://github.com/nanyte25/glitchtipctl"
+    install: |
+      bin.install "glitchtipctl"
+    dependencies:
+      - go
+
+# Snapcraft (if applicable)
+snapcrafts:
+  - name: glitchtipctl
+    summary: "CLI for Glitchtip Error Tracking"
+    description: "A powerful and lightweight CLI to manage Glitchtip"
+    grade: devel
+    confinement: classic
+    apps:
+      glitchtipctl:
+        command: glitchtipctl
+
+# Define the archives (binary packages) that should be created
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
