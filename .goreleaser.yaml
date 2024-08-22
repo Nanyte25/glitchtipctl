@@ -36,15 +36,6 @@ brews:
       - go
 
 # Snapcraft (if applicable)
-snapcrafts:
-  - name: glitchtipctl
-    summary: "CLI for Glitchtip Error Tracking"
-    description: "A powerful and lightweight CLI to manage Glitchtip"
-    grade: devel
-    confinement: classic
-    apps:
-      glitchtipctl:
-        command: glitchtipctl
 
 # Define the archives (binary packages) that should be created
 archives:
