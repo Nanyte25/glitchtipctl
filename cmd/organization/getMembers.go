@@ -43,7 +43,7 @@ func (m GetMembersModel) View() string {
 // GetMembersCmd represents the getMembers command
 var GetMembersCmd = &cobra.Command{
 	Use:   "getMembers [organization_slug]",
-	Short: "Fetch the members of an organization",
+	Short: "Fetch the members of an organization by organizational slug",
 	Long:  `Fetch and display the members of a specified organization by passing its slug.`,
 	Args:  cobra.ExactArgs(1), // Ensure exactly one argument is passed (the org slug)
 	Run: func(cmd *cobra.Command, args []string) {
