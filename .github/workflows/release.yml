@@ -1,36 +1,32 @@
-name: goreleaser
+name: glitchtip release
 
 on:
-  pull_request:
   push:
     tags:
       - 'v*'
 
-permissions:
-  contents: write
-
 jobs:
-  goreleaser:
+  release:
+    name: Release
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v4
         with:
-          go-version: '1.19.4'  # Specify your Go version here
+          go-version: '1.19.4'  # Set your desired Go version
 
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v4
         with:
-          distribution: goreleaser  # Use 'goreleaser' or 'goreleaser-pro'
-          version: '~> v2'           # Specify the GoReleaser version
-          args: release --clean      # Ensure the --clean flag is used to clean previous artifacts
+          version: latest
+          args: release --rm-dist  # Add the necessary args to run GoReleaser
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for publishing the release
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # This is your GitHub token for creating releases
+
 
 
 
