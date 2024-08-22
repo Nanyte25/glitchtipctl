@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -19,9 +20,9 @@ var CreateOrganizationCmd = &cobra.Command{
 	Short: "Create a new organization using the GlitchTip API",
 	Long: `Create a new organization within GlitchTip. This command requires the organization name to be provided:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Example usage:
+  glitchtipctl createOrganization -n "MyOrganization"
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		createOrganization(orgName)
 	},
@@ -32,6 +33,7 @@ func init() {
 	CreateOrganizationCmd.MarkFlagRequired("name")
 }
 
+// Create the organization and print the updated list of organizations
 func createOrganization(orgName string) {
 	apiToken := os.Getenv("GLITCHTIP_API_TOKEN")
 	if apiToken == "" {
@@ -39,12 +41,12 @@ func createOrganization(orgName string) {
 		return
 	}
 
-	url := "http://localhost:8000/api/0/organizations/" // Use the actual Glitchtip API endpoint
+	url := "http://localhost:8000/api/0/organizations/" // Replace with actual Glitchtip API endpoint
 
 	// Define the payload for creating the organization
 	payload := map[string]string{
 		"name": orgName,
-		"slug": generateSlug(orgName), // Assuming you have a function to generate a slug from the org name
+		"slug": generateSlug(orgName),
 	}
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -68,22 +70,62 @@ func createOrganization(orgName string) {
 	}
 	defer resp.Body.Close()
 
+	// Handle non-200 status codes
 	if resp.StatusCode >= 300 {
 		bodyBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-
-			fmt.Fprintf(os.Stdout, "Error reading response body: %v\n", []any{err}...)
+			fmt.Printf("Error reading response body: %v\n", err)
 			return
 		}
 		fmt.Printf("Failed to create organization, status code: %d, details: %s\n", resp.StatusCode, string(bodyBytes))
 	} else {
 		fmt.Println("Organization created successfully")
+		// Fetch and print the updated list of organizations
+		getAndPrintOrganizations(apiToken)
 	}
 }
 
-// This is a placeholder for your implementation.
+// Generate slug from the organization name (simple version)
 func generateSlug(name string) string {
-	// Implement slug generation logic here. This is a simplistic approach.
+	return strings.ToLower(strings.ReplaceAll(name, " ", "-"))
+}
 
-	return name // Placeholder, replace with actual slug generation logic.
+// Fetch the updated list of organizations and print them
+func getAndPrintOrganizations(apiToken string) {
+	url := "http://localhost:8000/api/0/organizations/" // Replace with the actual API endpoint
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Printf("Error creating request: %v\n", err)
+		return
+	}
+
+	req.Header.Add("Authorization", "Bearer "+apiToken)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Printf("Error fetching organizations: %v\n", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Error: received status code %d\n", resp.StatusCode)
+		return
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("Error reading response body: %v\n", err)
+		return
+	}
+
+	var organizations []Organization
+	err = json.Unmarshal(body, &organizations)
+	if err != nil {
+		fmt.Printf("Error parsing JSON response: %v\n", err)
+		return
+	}
+
+	printOrganizationsTable(organizations)
 }
