@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/nanyte25/glitchtipctl/cmd/organization"
@@ -23,6 +24,7 @@ Use this CLI to automate and manage tasks within your GlitchTip account.`,
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }
@@ -39,6 +41,9 @@ func init() {
 	rootCmd.AddCommand(team.CreateTeamCmd)
 	rootCmd.AddCommand(organization.CreateOrganizationCmd)
 	rootCmd.AddCommand(organization.GetOrganizationsCmd)
+
+	// Register the GetMembersCmd from the organization package
+	organization.AddGetMembersCmd(rootCmd) // Add getMembers command to root
 
 	// Additional commands can be added here.
 	rootCmd.Flags().BoolP("toggle", "t", false, "To toggle the debug mode")
