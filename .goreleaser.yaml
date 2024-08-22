@@ -1,45 +1,27 @@
 project_name: glitchtipctl
 
-# Define where the binaries will be stored
-dist: dist
-
-# Build multiple binaries for different OS/Arch combinations
 builds:
-  - env:
-      - CGO_ENABLED=0
+  - id: my_build
+    main: ./main.go
     goos:
-      - linux
       - windows
+      - linux
       - darwin
     goarch:
       - amd64
       - arm64
-    goarm:
-      - 6
-    ldflags:
-      - -s -w
-    binary: "{{ .ProjectName }}"
 
-# Define what files to include in the release
-archives:
-  - format: tar.gz
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    files:
-      - LICENSE
-      - README.md
+archive:
+  format: tar.gz
+  files:
+    - LICENSE
+    - README.md
 
-# Define GitHub release configuration
+changelog:
+  use: git
+
 release:
   github:
-    owner: nanyte25
+    owner: Nanyte25
     name: glitchtipctl
-
-# Define what to include in the release
-snapshot:
-  name_template: "{{ .Tag }}-{{ .ShortCommit }}"
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
+    token: ${{ secrets.GITHUB_TOKEN }}
