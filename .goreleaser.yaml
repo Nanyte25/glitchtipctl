@@ -18,10 +18,9 @@ builds:
 # Define the release settings
 release:
   github:
-    owner: your-github-username
-    name: your-repo-name
-    draft: false
-    prerelease: false
+    owner: nanyte25
+    name: glitchtipctl
+   
 
 # Define the distribution packaging
 brews:
