@@ -1,33 +1,37 @@
-name: Release
+name: goreleaser
 
 on:
+  pull_request:
   push:
     tags:
       - 'v*'
 
-jobs:
-  release:
-    name: Release
-    runs-on: ubuntu-latest
+permissions:
+  contents: write
 
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.19.4'
+          go-version: '1.19.4'  # Specify your Go version here
 
-      - name: Install GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
         with:
-          version: latest
-
-      - name: Run GoReleaser with verbose output
-        run: goreleaser release --rm-dist --debug
+          distribution: goreleaser  # Use 'goreleaser' or 'goreleaser-pro'
+          version: '~> v2'           # Specify the GoReleaser version
+          args: release --clean      # Ensure the --clean flag is used to clean previous artifacts
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for publishing the release
+
 
 
 
